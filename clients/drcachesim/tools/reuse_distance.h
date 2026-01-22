@@ -192,7 +192,7 @@ struct line_ref_node_t {
     }
 };
 
-// We use a splay to keep track of the cache line reuse distance.
+// We use a splay tree to keep track of the cache line reuse distance.
 // The lefmost node of the splay tree is the most recently accessed cache line.
 // The earlier the cache line was last accessed, the more to the right this cache line
 // is in the splay tree.
@@ -203,8 +203,8 @@ struct line_ref_node_t {
 // line referenced within the threshold.  Thus, we can quickly check
 // whether a cache line is recently accessed by comparing the time
 // stamp of the referenced cache line and the gate cache line.
-// The splay tree is a binary search tree that using splay operatio for balancing, it
-// allow to delete and insert an element at any position in O(log n) amortizated time.
+// The splay tree is a binary search tree that uses the splay operation for balancing, which
+// allows deleting and inserting an element at any position in O(log n) amortized time.
 struct line_ref_splay_t {
     line_ref_node_t *root_; // root of the splay
     line_ref_node_t *gate_; // the earliest cache line refs within the threshold
@@ -459,8 +459,8 @@ struct line_ref_splay_t {
         return root;
     }
 
-    // Find previos element of ref in the splay tree.
-    // Returns a pointer to the previos node.
+    // Find previous element of ref in the splay tree.
+    // Returns a pointer to the previous node.
     line_ref_node_t *
     get_prev(line_ref_node_t *ref)
     {
@@ -468,19 +468,19 @@ struct line_ref_splay_t {
             return nullptr;
         // the last visited node
         line_ref_node_t *last = nullptr;
-        // Walk up by tree wihle did not found a node to the left of the current
+        // Walk up by tree while we do not find a node to the left of the current
         while ((ref->left == nullptr || ref->left == last) && ref->parent != nullptr &&
                ref->parent->left == ref) {
             last = ref;
             ref = ref->parent;
         }
 
-        // previos node is the far right node in left subtree
+        // previous node is the far right node in left subtree
         if (ref->left != nullptr && ref->left != last) {
             return get_tail(ref->left);
         }
 
-        // if the node is right child of another, the parent is the previos node
+        // if the node is right child of another, the parent is the previous node
         if (ref->parent != nullptr && ref->parent->right == ref)
             return ref->parent;
         return nullptr;
